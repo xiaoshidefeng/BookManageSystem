@@ -17,11 +17,13 @@
         </div>
         <el-table :data="tableData" border style="width: 100%" ref="multipleTable" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55"></el-table-column>
-            <el-table-column prop="date" label="日期" sortable width="150">
+            <el-table-column prop="book_id" label="id" sortable width="50">
             </el-table-column>
-            <el-table-column prop="name" label="姓名" width="120">
+            <el-table-column prop="isbn" label="ISBN" width="120">
             </el-table-column>
-            <el-table-column prop="address" label="地址" :formatter="formatter">
+            <el-table-column prop="write" label="作者" width="100">
+            </el-table-column>
+            <el-table-column prop="name" label="书名"  >
             </el-table-column>
             <el-table-column label="操作" width="180">
                 <template scope="scope">
@@ -68,6 +70,7 @@
         data() {
             return {
                 url: '../../../static/vuetable.json',
+                api: 'http://localhost:8080/show',
                 tableData: [],
                 cur_page: 1,
                 multipleSelection: [],
@@ -97,12 +100,17 @@
             },
             getData(){
                 let self = this;
-                if(process.env.NODE_ENV === 'development'){
-                    self.url = '/ms/table/list';
-                };
-                self.$axios.post(self.url, {page:self.cur_page}).then((res) => {
-                    self.tableData = res.data.list;
+                // if(process.env.NODE_ENV === 'development'){
+                //     self.url = '/ms/table/list';
+                // };
+                self.$axios.get(self.api).then((response) => {
+                  // console.log(response.data)
+                  self.tableData = response.data;
+                  console.log(response.data)
                 })
+                // self.$axios.post(self.url, {page:self.cur_page}).then((res) => {
+                //     self.tableData = res.data.list;
+                // })
             },
             formatter(row, column) {
                 return row.address;
