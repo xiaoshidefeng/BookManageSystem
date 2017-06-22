@@ -36,11 +36,11 @@
                         subs: [
                             {
                                 index: 'basetable',
-                                title: '基础表格'
+                                title: '人员管理表'
                             },
                             {
                                 index: 'vuetable',
-                                title: 'Vue表格组件'
+                                title: '图书管理表'
                             }
                         ]
                     },

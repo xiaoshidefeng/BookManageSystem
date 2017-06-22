@@ -9,8 +9,8 @@
         <div class="handle-box">
             <el-button class="handle-del mr10">批量删除</el-button>
             <el-select v-model="select_cate" placeholder="筛选省份" class="handle-select mr10">
-                <el-option key="1" label="广东省" value="1"></el-option>
-                <el-option key="2" label="湖南省" value="2"></el-option>
+                <el-option key="1" label="浙江省" value="1"></el-option>
+                <el-option key="2" label="江苏省" value="2"></el-option>
             </el-select>
             <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
             <el-button type="primary" icon="search">搜索</el-button>
@@ -39,6 +39,27 @@
                     :total="1000">
             </el-pagination>
         </div>
+
+        <div id="updateform">
+          <el-dialog title="修改图书信息" :visible.sync="update">
+          <el-form :model="form">
+            <el-form-item label="活动名称" :label-width="formLabelWidth">
+              <el-input v-model="form.name" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="活动区域" :label-width="formLabelWidth">
+              <el-select v-model="form.region" placeholder="请选择活动区域">
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="update = false">取 消</el-button>
+            <el-button type="primary" @click="update = false">确 定</el-button>
+          </div>
+          </el-dialog>
+        </div>
+
     </div>
 </template>
 
@@ -51,7 +72,19 @@
                 cur_page: 1,
                 multipleSelection: [],
                 select_cate: '',
-                select_word: ''
+                select_word: '',
+                update: false,
+                form: {
+                  name: '',
+                  region: '',
+                  date1: '',
+                  date2: '',
+                  delivery: false,
+                  type: [],
+                  resource: '',
+                  desc: ''
+                },
+                formLabelWidth: '120px'
             }
         },
         created(){
@@ -78,15 +111,35 @@
                 return row.tag === value;
             },
             handleEdit(index, row) {
-                this.$message('编辑第'+(index+1)+'行');
+                // this.$message('编辑第'+(index+1)+'行');
+                this.update = true;
             },
             handleDelete(index, row) {
-                this.$message.error('删除第'+(index+1)+'行');
-            },
+              //删除
+                //this.$message.error('删除第'+(index+1)+'行');
+                this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+                  confirmButtonText: '确定',
+                  cancelButtonText: '取消',
+                  type: 'warning'
+                }).then(() => {
+                  this.$message({
+                    type: 'success',
+                    message: '删除成功!'
+                  });
+                  this.tableData.splice(index, 1);
+                }).catch(() => {
+                  this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                  });
+                });
+
+              },
             handleSelectionChange: function(val) {
                 this.multipleSelection = val;
             }
-        }
+          }
+
     }
 </script>
 

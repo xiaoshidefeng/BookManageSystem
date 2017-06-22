@@ -35,15 +35,15 @@
                         key: 'id',
                     },
                     {
-                        name: 'Name',
+                        name: '图书名字',
                         key: 'name',
                     },
                     {
-                        name: 'email',
+                        name: 'ISBN',
                         key: 'email',
                     },
                     {
-                        name: 'ip',
+                        name: '作者',
                         key: 'ip',
                     }
                 ],
