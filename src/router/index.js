@@ -23,7 +23,7 @@ export default new Router({
                 },
                 {
                     path: '/vuetable',
-                    component: resolve => require(['../components/page/VueTable.vue'], resolve)     // vue-datasource组件
+                    component: resolve => require(['../components/page/PeopleManageTable.vue'], resolve)     // vue-datasource组件
                 },
                 {
                     path: '/baseform',

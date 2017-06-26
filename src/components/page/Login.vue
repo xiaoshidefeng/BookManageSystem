@@ -33,21 +33,46 @@
                     password: [
                         { required: true, message: '请输入密码', trigger: 'blur' }
                     ]
-                }
+                },
+                api: 'http://127.0.0.1:8080/'
             }
         },
         methods: {
             submitForm(formName) {
                 const self = this;
-                self.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        localStorage.setItem('ms_username',self.ruleForm.username);
-                        self.$router.push('/readme');
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                });
+                console.log(this.username);
+                var qs = require('qs');
+                this.$axios.post(self.api + 'userlogin', qs.stringify({
+                  name: this.ruleForm.username,
+                  password: this.ruleForm.password,
+                }),
+                {
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                  }
+                }).then(response => {
+                  console.log(response.data);
+                  if (response.data == 'success') {
+                      localStorage.setItem('ms_username',self.ruleForm.username);
+                      self.$router.push('/readme');
+                  } else {
+                      console.log('error submit!!');
+                      this.username.required = true;
+                      this.username.message = '用户名和密码错误';
+
+                      return false;
+                  }
+                })
+
+                // self.$refs[formName].validate((valid) => {
+                //     if (valid) {
+                //         localStorage.setItem('ms_username',self.ruleForm.username);
+                //         self.$router.push('/readme');
+                //     } else {
+                //         console.log('error submit!!');
+                //         return false;
+                //     }
+                // });
             }
         }
     }
