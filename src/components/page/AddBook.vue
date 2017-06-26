@@ -1,9 +1,18 @@
 <template>
-    <div id="updateform">
+    <div id="addbook">
       <!-- Form -->
 
-      <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
+      <el-dialog title="添加" :visible.sync="dialogFormVisible">
       <el-form :model="form">
+        <el-form-item label="活动名称" :label-width="formLabelWidth">
+          <el-input v-model="form.name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="活动名称" :label-width="formLabelWidth">
+          <el-input v-model="form.name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="活动名称" :label-width="formLabelWidth">
+          <el-input v-model="form.name" auto-complete="off"></el-input>
+        </el-form-item>
         <el-form-item label="活动名称" :label-width="formLabelWidth">
           <el-input v-model="form.name" auto-complete="off"></el-input>
         </el-form-item>

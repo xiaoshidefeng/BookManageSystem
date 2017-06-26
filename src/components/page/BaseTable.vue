@@ -7,7 +7,8 @@
             </el-breadcrumb>
         </div>
         <div class="handle-box">
-            <el-button class="handle-del mr10">批量删除</el-button>
+          <el-button type="primary" icon="plus" @click="addBooks( )">添加图书</el-button>
+            <!-- <el-button class="handle-del mr10">批量删除</el-button> -->
             <el-select v-model="select_cate" placeholder="筛选省份" class="handle-select mr10">
                 <el-option key="1" label="浙江省" value="1"></el-option>
                 <el-option key="2" label="江苏省" value="2"></el-option>
@@ -17,7 +18,7 @@
         </div>
         <el-table :data="tableData" border style="width: 100%" ref="multipleTable" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55"></el-table-column>
-            <el-table-column prop="book_id" label="id" sortable width="50">
+            <el-table-column prop="book_id" label="id" sortable width="70">
             </el-table-column>
             <el-table-column prop="isbn" label="ISBN" width="120">
             </el-table-column>
@@ -25,7 +26,7 @@
             </el-table-column>
             <el-table-column prop="name" label="书名"  >
             </el-table-column>
-            <el-table-column label="操作" width="180">
+            <el-table-column label="操作" width="160">
                 <template scope="scope">
                     <el-button size="small"
                             @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -42,22 +43,55 @@
             </el-pagination>
         </div>
 
-        <div id="updateform">
-          <el-dialog title="修改图书信息" :visible.sync="update">
+        <div id="add">
+          <el-dialog title="添加图书" :visible.sync="addbook">
           <el-form :model="form">
-            <el-form-item label="活动名称" :label-width="formLabelWidth">
-              <el-input v-model="form.name" auto-complete="off"></el-input>
+            <el-form-item label="图书名称" :label-width="formLabelWidth">
+              <el-input v-model="addform.newBookName" auto-complete="off"></el-input>
             </el-form-item>
-            <el-form-item label="活动区域" :label-width="formLabelWidth">
-              <el-select v-model="form.region" placeholder="请选择活动区域">
-                <el-option label="区域一" value="shanghai"></el-option>
-                <el-option label="区域二" value="beijing"></el-option>
-              </el-select>
+            <el-form-item label="作者" :label-width="formLabelWidth">
+              <el-input v-model="addform.newWrite" auto-complete="off"></el-input>
             </el-form-item>
+            <el-form-item label="库存" :label-width="formLabelWidth">
+              <el-input v-model="addform.newInventory" type="number" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="出版社" :label-width="formLabelWidth">
+              <el-input v-model="addform.newpublisher" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="isbn" :label-width="formLabelWidth">
+              <el-input v-model="addform.newisbn" auto-complete="off"></el-input>
+            </el-form-item>
+
           </el-form>
           <div slot="footer" class="dialog-footer">
+            <el-button @click="addbook = false">取 消</el-button>
+            <el-button type="primary" @click="addBookToSql(scope.row)">确 定</el-button>
+          </div>
+          </el-dialog>
+        </div>
+
+        <div id="updateform">
+          <el-dialog title="修改图书信息" :visible.sync="update">
+            <el-form :model="form">
+              <el-form-item label="图书名称" :label-width="formLabelWidth">
+                <el-input v-model="addform.newBookName" auto-complete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="作者" :label-width="formLabelWidth">
+                <el-input v-model="addform.newWrite" auto-complete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="库存" :label-width="formLabelWidth">
+                <el-input v-model="addform.newInventory" type="number" auto-complete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="出版社" :label-width="formLabelWidth">
+                <el-input v-model="addform.newpublisher" auto-complete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="isbn" :label-width="formLabelWidth">
+                <el-input v-model="addform.newisbn" auto-complete="off"></el-input>
+              </el-form-item>
+           </el-form>
+          <div slot="footer" class="dialog-footer">
             <el-button @click="update = false">取 消</el-button>
-            <el-button type="primary" @click="update = false">确 定</el-button>
+            <el-button type="primary" @click="updateBookToSql()">确 定</el-button>
           </div>
           </el-dialog>
         </div>
@@ -70,13 +104,23 @@
         data() {
             return {
                 url: '../../../static/vuetable.json',
-                api: 'http://localhost:8080/show',
+                api: 'http://localhost:8080/showAllBook',
                 tableData: [],
                 cur_page: 1,
                 multipleSelection: [],
                 select_cate: '',
                 select_word: '',
+                addbook: false,
                 update: false,
+                updateBookload: false,
+                id: '',
+                addform: {
+                  newBookName: '',
+                  newWrite: '',
+                  newInventory: '',
+                  newpublisher: '',
+                  newisbn: ''
+                },
                 form: {
                   name: '',
                   region: '',
@@ -118,34 +162,136 @@
             filterTag(value, row) {
                 return row.tag === value;
             },
+            addBooks() {
+                this.addbook = true;
+            },
             handleEdit(index, row) {
-                // this.$message('编辑第'+(index+1)+'行');
+                // this.$message('编辑第'+ row.write +'行');
                 this.update = true;
+                this.addform.newBookName = row.name;
+                this.addform.newWrite = row.write;
+                this.addform.newInventory = row.inventory;
+                this.addform.newpublisher = row.publisher;
+                this.addform.newisbn = row.isbn;
+                this.id = row.book_id;
+            },
+            updateBookToSql(row) {
+              if(this.addform.newBookName == "") {
+                this.$message({
+                  type: 'warning',
+                  message: '书籍名字为空'
+                });
+              }else if(this.addform.newisbn == "") {
+                this.$message({
+                  type: 'warning',
+                  message: 'ISBN为空'
+                });
+              }else if(this.addform.newWrite == "") {
+                this.$message({
+                  type: 'warning',
+                  message: '作者名字为空'
+                });
+              }else {
+
+                var qs = require('qs');
+                this.$axios.post('http://127.0.0.1:8080/updateBook', qs.stringify({
+                  name: this.addform.newBookName,
+                  write: this.addform.newWrite,
+                  inventory: this.addform.newInventory,
+                  publisher: this.addform.newpublisher,
+                  isbn: this.addform.newisbn,
+                  book_id: this.id
+                }),
+                {
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                  }
+                }).then(response => {
+                  console.log(response.data);
+                })
+              }
+
+            this.update = false;
+
             },
             handleDelete(index, row) {
-              //删除
-                //this.$message.error('删除第'+(index+1)+'行');
-                this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
-                  confirmButtonText: '确定',
-                  cancelButtonText: '取消',
-                  type: 'warning'
-                }).then(() => {
-                  this.$message({
-                    type: 'success',
-                    message: '删除成功!'
-                  });
-                  this.tableData.splice(index, 1);
-                }).catch(() => {
-                  this.$message({
-                    type: 'info',
-                    message: '已取消删除'
-                  });
-                });
+            //删除
+            //this.$message.error('删除第'+(index+1)+'行');
+            this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
 
-              },
-            handleSelectionChange: function(val) {
-                this.multipleSelection = val;
+              console.log(row.book_id);
+              var url = 'http://127.0.0.1:8080/deleteBookById?id=' + row.book_id;
+              var qs = require('qs');
+              this.$axios.delete(url, qs.stringify({
+                // book_id: row.book_id
+              }),
+              {
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+                }
+              }).then(response => {
+                console.log(response.data);
+              })
+
+
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              });
+              this.tableData.splice(index, 1);
+            }).catch(() => {
+              this.$message({
+                type: 'info',
+                message: '已取消删除'
+              });
+            });
+
+          },
+          addBookToSql() {
+            if(this.addform.newBookName == "") {
+              this.$message({
+                type: 'warning',
+                message: '书籍名字为空'
+              });
+            }else if(this.addform.newisbn == "") {
+              this.$message({
+                type: 'warning',
+                message: 'ISBN为空'
+              });
+            }else if(this.addform.newWrite == "") {
+              this.$message({
+                type: 'warning',
+                message: '作者名字为空'
+              });
+            }else {
+
+              var qs = require('qs');
+              this.$axios.post('http://127.0.0.1:8080/insertBook', qs.stringify({
+                name: this.addform.newBookName,
+                write: this.addform.newWrite,
+                inventory: this.addform.newInventory,
+                publisher: this.addform.newpublisher,
+                isbn: this.addform.newisbn
+              }),
+              {
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+                }
+              }).then(response => {
+                console.log(response.data);
+              })
             }
+
+            this.addbook = false;
+
+          },
+          handleSelectionChange: function(val) {
+              this.multipleSelection = val;
+          }
           }
 
     }
