@@ -41,6 +41,14 @@
                             {
                                 index: 'vuetable',
                                 title: '人员管理表'
+                            },
+                            {
+                                index: 'renttable',
+                                title: '借书情况表'
+                            },
+                            {
+                                index: 'returnbooktable',
+                                title: '还书情况表'
                             }
                         ]
                     },

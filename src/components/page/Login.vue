@@ -57,11 +57,13 @@
                       self.$router.push('/readme');
                   } else {
                       console.log('error submit!!');
-                      this.username.required = true;
-                      this.username.message = '用户名和密码错误';
-
+                      this.$message({
+                        type: 'error',
+                        message: '用户名或密码错误'
+                      });
                       return false;
                   }
+
                 })
 
                 // self.$refs[formName].validate((valid) => {

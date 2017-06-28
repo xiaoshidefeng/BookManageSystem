@@ -26,6 +26,14 @@ export default new Router({
                     component: resolve => require(['../components/page/PeopleManageTable.vue'], resolve)     // vue-datasource组件
                 },
                 {
+                    path: '/renttable',
+                    component: resolve => require(['../components/page/RentBookTable.vue'], resolve)     // vue-datasource组件
+                },
+                {
+                    path: '/returnbooktable',
+                    component: resolve => require(['../components/page/ReturnBookTable.vue'], resolve)     // vue-datasource组件
+                },
+                {
                     path: '/baseform',
                     component: resolve => require(['../components/page/BaseForm.vue'], resolve)
                 },

@@ -17,21 +17,29 @@
             <el-button type="primary" icon="search">搜索</el-button>
         </div>
         <el-table :data="tableData" border style="width: 100%" ref="multipleTable" @selection-change="handleSelectionChange">
-            <el-table-column type="selection" width="55"></el-table-column>
-            <el-table-column prop="book_id" label="id" sortable width="70">
+            <!-- <el-table-column type="selection" width="55"></el-table-column> -->
+            <el-table-column prop="rent" label="借书" width="75">
+              <template scope="scope">
+                <el-button size="small" type="primary"
+                        @click="handleRentBook(scope.$index, scope.row)">借书</el-button>
+              </template>
+
             </el-table-column>
-            <el-table-column prop="isbn" label="ISBN" width="120">
+
+            <el-table-column prop="book_id" label="id" sortable width="80">
+            </el-table-column>
+            <el-table-column prop="isbn" label="ISBN" width="180">
             </el-table-column>
             <el-table-column prop="write" label="作者" width="100">
             </el-table-column>
-            <el-table-column prop="name" label="书名"  >
+            <el-table-column prop="name" label="书名">
             </el-table-column>
             <el-table-column label="操作" width="160">
                 <template scope="scope">
                     <el-button size="small"
                             @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                     <el-button size="small" type="danger"
-                            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                                    @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -96,6 +104,23 @@
           </el-dialog>
         </div>
 
+        <div id="rentFrom">
+          <el-dialog title="借书" :visible.sync="rentbook">
+            <el-select v-model="client_id" placeholder="请选择">
+              <el-option
+                v-for="item in options"
+                :key="item.client_id"
+                :label="item.clientname"
+                :value="item.client_id">
+              </el-option>
+            </el-select>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="rentbook = false">取 消</el-button>
+            <el-button type="primary" @click="rentBookToSql()">借 书</el-button>
+          </div>
+          </el-dialog>
+        </div>
+
     </div>
 </template>
 
@@ -104,7 +129,7 @@
         data() {
             return {
                 url: '../../../static/vuetable.json',
-                api: 'http://localhost:8080/showAllBook',
+                api: 'http://localhost:8080/',
                 tableData: [],
                 cur_page: 1,
                 multipleSelection: [],
@@ -113,7 +138,18 @@
                 addbook: false,
                 update: false,
                 updateBookload: false,
+                rentbook: false,
                 id: '',
+                bid: '',
+                options: [{
+                  client_id: '',
+                  clientname: '',
+                  clientaddress: ''
+                }],
+                client_id: '',
+                // options: [],
+                // clientname: '',
+                // options: [],
                 addform: {
                   newBookName: '',
                   newWrite: '',
@@ -147,7 +183,7 @@
                 // if(process.env.NODE_ENV === 'development'){
                 //     self.url = '/ms/table/list';
                 // };
-                self.$axios.get(self.api).then((response) => {
+                self.$axios.get(self.api + 'showAllBook').then((response) => {
                   // console.log(response.data)
                   self.tableData = response.data;
                   console.log(response.data)
@@ -194,7 +230,7 @@
               }else {
 
                 var qs = require('qs');
-                this.$axios.post('http://127.0.0.1:8080/updateBook', qs.stringify({
+                this.$axios.post(this.api + 'updateBook', qs.stringify({
                   name: this.addform.newBookName,
                   write: this.addform.newWrite,
                   inventory: this.addform.newInventory,
@@ -224,7 +260,7 @@
             }).then(() => {
 
               console.log(row.book_id);
-              var url = 'http://127.0.0.1:8080/deleteBookById?id=' + row.book_id;
+              var url = this.api + 'deleteBookById?id=' + row.book_id;
               var qs = require('qs');
               this.$axios.delete(url, qs.stringify({
                 // book_id: row.book_id
@@ -270,7 +306,7 @@
             }else {
 
               var qs = require('qs');
-              this.$axios.post('http://127.0.0.1:8080/insertBook', qs.stringify({
+              this.$axios.post(this.api + 'insertBook', qs.stringify({
                 name: this.addform.newBookName,
                 write: this.addform.newWrite,
                 inventory: this.addform.newInventory,
@@ -291,6 +327,38 @@
           },
           handleSelectionChange: function(val) {
               this.multipleSelection = val;
+          },
+          handleRentBook(index, row) {
+              this.bid = row.book_id;
+              this.rentbook = true;
+              let self = this;
+              self.$axios.get(self.api + 'showClient').then((response) => {
+                self.options = response.data;
+                console.log(response.data)
+              })
+          },
+          rentBookToSql() {
+              // console.log(this.client_id);
+              var s = new Date().toLocaleString( );
+              console.log(s);
+              var qs = require('qs');
+              this.$axios.post(this.api + 'rentBook', qs.stringify({
+                client_id: this.client_id,
+                book_id: this.bid,
+                renttime: s
+              }),
+              {
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+                }
+              }).then(response => {
+                console.log(response.data);
+              })
+              this.rentbook = false;
+              this.$message({
+                type: 'success',
+                message: '借书成功'
+              });
           }
           }
 
