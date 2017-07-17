@@ -5,3 +5,5 @@
 项目源自于https://github.com/lin-xin/vue-manage-system
 
 [项目演示地址](http://118.89.159.95:8080/bookmanage)
+用户名：admin
+密码：admin
