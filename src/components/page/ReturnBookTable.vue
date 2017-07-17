@@ -15,13 +15,13 @@
             width="180">
           </el-table-column>
           <el-table-column
-            prop="client_name"
+            prop="clientName"
             label="姓名"
             width="180">
           </el-table-column>
           </el-table-column>
           <el-table-column
-            prop="book_name"
+            prop="bookName"
             label="书名">
           </el-table-column>
         </el-table>
@@ -34,7 +34,7 @@
           data() {
             return {
               tableData: [],
-              api: 'http://localhost:8080/'
+              api: 'http://118.89.159.95:8890/api/'
             }
           },
           created(){
@@ -43,7 +43,7 @@
           methods: {
               getData(){
                   let self = this;
-                  self.$axios.get(self.api + 'showAllReturn').then((response) => {
+                  self.$axios.get(self.api + 'returns').then((response) => {
                     self.tableData = response.data;
                     console.log(response.data)
                   })

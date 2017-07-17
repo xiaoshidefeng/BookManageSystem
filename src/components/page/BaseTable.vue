@@ -9,10 +9,10 @@
         <div class="handle-box">
           <el-button type="primary" icon="plus" @click="addBooks( )">添加图书</el-button>
             <!-- <el-button class="handle-del mr10">批量删除</el-button> -->
-            <el-select v-model="select_cate" placeholder="筛选省份" class="handle-select mr10">
+            <!-- <el-select v-model="select_cate" placeholder="筛选省份" class="handle-select mr10">
                 <el-option key="1" label="浙江省" value="1"></el-option>
                 <el-option key="2" label="江苏省" value="2"></el-option>
-            </el-select>
+            </el-select> -->
             <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
             <el-button type="primary" icon="search">搜索</el-button>
         </div>
@@ -26,15 +26,17 @@
 
             </el-table-column>
 
-            <el-table-column prop="book_id" label="id" sortable width="80">
+            <el-table-column prop="bookId" label="id" sortable width="60">
             </el-table-column>
             <el-table-column prop="isbn" label="ISBN" width="180">
             </el-table-column>
-            <el-table-column prop="write" label="作者" width="100">
+            <el-table-column prop="author" label="作者" width="100">
+            </el-table-column>
+            <el-table-column prop="publisher" label="出版社" width="125">
             </el-table-column>
             <el-table-column prop="name" label="书名">
             </el-table-column>
-            <el-table-column label="操作" width="160">
+            <el-table-column label="操作" width="150">
                 <template scope="scope">
                     <el-button size="small"
                             @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -58,7 +60,7 @@
               <el-input v-model="addform.newBookName" auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item label="作者" :label-width="formLabelWidth">
-              <el-input v-model="addform.newWrite" auto-complete="off"></el-input>
+              <el-input v-model="addform.newAuthor" auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item label="库存" :label-width="formLabelWidth">
               <el-input v-model="addform.newInventory" type="number" auto-complete="off"></el-input>
@@ -85,7 +87,7 @@
                 <el-input v-model="addform.newBookName" auto-complete="off"></el-input>
               </el-form-item>
               <el-form-item label="作者" :label-width="formLabelWidth">
-                <el-input v-model="addform.newWrite" auto-complete="off"></el-input>
+                <el-input v-model="addform.newAuthor" auto-complete="off"></el-input>
               </el-form-item>
               <el-form-item label="库存" :label-width="formLabelWidth">
                 <el-input v-model="addform.newInventory" type="number" auto-complete="off"></el-input>
@@ -106,12 +108,12 @@
 
         <div id="rentFrom">
           <el-dialog title="借书" :visible.sync="rentbook">
-            <el-select v-model="client_id" placeholder="请选择">
+            <el-select v-model="clientId" placeholder="请选择">
               <el-option
                 v-for="item in options"
-                :key="item.client_id"
+                :key="item.clientId"
                 :label="item.clientname"
-                :value="item.client_id">
+                :value="item.clientId">
               </el-option>
             </el-select>
           <div slot="footer" class="dialog-footer">
@@ -129,7 +131,7 @@
         data() {
             return {
                 url: '../../../static/vuetable.json',
-                api: 'http://localhost:8080/',
+                api: 'http://118.89.159.95:8890/api/',
                 tableData: [],
                 cur_page: 1,
                 multipleSelection: [],
@@ -142,17 +144,17 @@
                 id: '',
                 bid: '',
                 options: [{
-                  client_id: '',
+                  clientId: '',
                   clientname: '',
                   clientaddress: ''
                 }],
-                client_id: '',
+                clientId: '',
                 // options: [],
                 // clientname: '',
                 // options: [],
                 addform: {
                   newBookName: '',
-                  newWrite: '',
+                  newAuthor: '',
                   newInventory: '',
                   newpublisher: '',
                   newisbn: ''
@@ -183,7 +185,7 @@
                 // if(process.env.NODE_ENV === 'development'){
                 //     self.url = '/ms/table/list';
                 // };
-                self.$axios.get(self.api + 'showAllBook').then((response) => {
+                self.$axios.get(self.api + 'books').then((response) => {
                   // console.log(response.data)
                   self.tableData = response.data;
                   console.log(response.data)
@@ -205,11 +207,11 @@
                 // this.$message('编辑第'+ row.write +'行');
                 this.update = true;
                 this.addform.newBookName = row.name;
-                this.addform.newWrite = row.write;
+                this.addform.newAuthor = row.author;
                 this.addform.newInventory = row.inventory;
                 this.addform.newpublisher = row.publisher;
                 this.addform.newisbn = row.isbn;
-                this.id = row.book_id;
+                this.id = row.bookId;
             },
             updateBookToSql(row) {
               if(this.addform.newBookName == "") {
@@ -222,7 +224,7 @@
                   type: 'warning',
                   message: 'ISBN为空'
                 });
-              }else if(this.addform.newWrite == "") {
+              }else if(this.addform.newAuthor == "") {
                 this.$message({
                   type: 'warning',
                   message: '作者名字为空'
@@ -230,13 +232,12 @@
               }else {
 
                 var qs = require('qs');
-                this.$axios.post(this.api + 'updateBook', qs.stringify({
+                this.$axios.post(this.api + 'updateBook/' + this.id, qs.stringify({
                   name: this.addform.newBookName,
-                  write: this.addform.newWrite,
+                  author: this.addform.newAuthor,
                   inventory: this.addform.newInventory,
                   publisher: this.addform.newpublisher,
-                  isbn: this.addform.newisbn,
-                  book_id: this.id
+                  isbn: this.addform.newisbn
                 }),
                 {
                   headers: {
@@ -259,10 +260,10 @@
               type: 'warning'
             }).then(() => {
 
-              console.log(row.book_id);
-              var url = this.api + 'deleteBookById?id=' + row.book_id;
+              console.log(row.bookid);
+              var url = this.api + 'deleteBook/' + row.bookId;
               var qs = require('qs');
-              this.$axios.delete(url, qs.stringify({
+              this.$axios.post(url, qs.stringify({
                 // book_id: row.book_id
               }),
               {
@@ -298,7 +299,7 @@
                 type: 'warning',
                 message: 'ISBN为空'
               });
-            }else if(this.addform.newWrite == "") {
+            }else if(this.addform.newAuthor == "") {
               this.$message({
                 type: 'warning',
                 message: '作者名字为空'
@@ -308,7 +309,7 @@
               var qs = require('qs');
               this.$axios.post(this.api + 'insertBook', qs.stringify({
                 name: this.addform.newBookName,
-                write: this.addform.newWrite,
+                author: this.addform.newAuthor,
                 inventory: this.addform.newInventory,
                 publisher: this.addform.newpublisher,
                 isbn: this.addform.newisbn
@@ -329,22 +330,22 @@
               this.multipleSelection = val;
           },
           handleRentBook(index, row) {
-              this.bid = row.book_id;
+              this.bid = row.bookId;
               this.rentbook = true;
               let self = this;
-              self.$axios.get(self.api + 'showClient').then((response) => {
+              self.$axios.get(self.api + 'clients').then((response) => {
                 self.options = response.data;
                 console.log(response.data)
               })
           },
           rentBookToSql() {
-              // console.log(this.client_id);
+              // console.log(clientname);
               var s = new Date().toLocaleString( );
               console.log(s);
               var qs = require('qs');
               this.$axios.post(this.api + 'rentBook', qs.stringify({
-                client_id: this.client_id,
-                book_id: this.bid,
+                clientId: this.clientId,
+                bookId: this.bid,
                 renttime: s
               }),
               {

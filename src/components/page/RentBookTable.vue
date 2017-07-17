@@ -15,22 +15,22 @@
             width="180">
           </el-table-column>
           <el-table-column
-            prop="client_id"
+            prop="clientId"
             label="用户id"
             width="80">
           </el-table-column>
           <el-table-column
-            prop="client_name"
+            prop="clientName"
             label="姓名"
             width="80">
           </el-table-column>
           <el-table-column
-            prop="book_id"
+            prop="bookId"
             label="图书id"
             width="80">
           </el-table-column>
           <el-table-column
-            prop="book_name"
+            prop="bookName"
             label="书名">
           </el-table-column>
           <el-table-column label="操作" width="100">
@@ -66,7 +66,7 @@
               //   address: '上海市普陀区金沙江路 1516 弄'
               // }]
               tableData: [],
-              api: 'http://localhost:8080/'
+              api: 'http://118.89.159.95:8890/api/'
             }
           },
           created(){
@@ -75,24 +75,25 @@
           methods: {
               getData(){
                   let self = this;
-                  self.$axios.get(self.api + 'showAllRent').then((response) => {
+                  self.$axios.get(self.api + 'rents').then((response) => {
                     self.tableData = response.data;
                     console.log(response.data)
                   })
               },
               returnBook(index, row) {
 
-                  this.$confirm('是否还掉' + row.book_name, '提示', {
+                  this.$confirm('是否还掉' + row.bookName, '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                   }).then(() => {
                     var s = new Date().toLocaleString( );
-                    console.log(row.client_id);
+                    console.log(row.clientId);
                     var qs = require('qs');
-                    this.$axios.post(this.api + 'insertReturn', qs.stringify({
-                      client_id: row.client_id,
-                      book_id: row.book_id,
+                    this.$axios.post(this.api + 'returnBook', qs.stringify({
+                      clientId: row.clientId,
+                      bookId: row.bookId,
+                      renttime: row.renttime,
                       returntime: s
                     }),
                     {

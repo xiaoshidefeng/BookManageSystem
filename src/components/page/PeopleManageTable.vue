@@ -9,16 +9,16 @@
         <div class="handle-box">
           <el-button type="primary" icon="plus" @click="addBooks( )">添加人员</el-button>
             <!-- <el-button class="handle-del mr10">批量删除</el-button> -->
-            <el-select v-model="select_cate" placeholder="筛选省份" class="handle-select mr10">
+            <!-- <el-select v-model="select_cate" placeholder="筛选省份" class="handle-select mr10">
                 <el-option key="1" label="浙江省" value="1"></el-option>
                 <el-option key="2" label="江苏省" value="2"></el-option>
-            </el-select>
+            </el-select> -->
             <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
             <el-button type="primary" icon="search">搜索</el-button>
         </div>
         <el-table :data="tableData" border style="width: 100%" ref="multipleTable" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55"></el-table-column>
-            <el-table-column prop="client_id" label="id" sortable width="130">
+            <el-table-column prop="clientId" label="id" sortable width="130">
             </el-table-column>
             <el-table-column prop="clientname" label="姓名" width="170">
             </el-table-column>
@@ -84,7 +84,7 @@
         data() {
             return {
                 url: '../../../static/vuetable.json',
-                api: 'http://localhost:8080/',
+                api: 'http://118.89.159.95:8890/api/',
                 tableData: [],
                 cur_page: 1,
                 multipleSelection: [],
@@ -124,7 +124,7 @@
                 // if(process.env.NODE_ENV === 'development'){
                 //     self.url = '/ms/table/list';
                 // };
-                self.$axios.get(self.api + 'showClient').then((response) => {
+                self.$axios.get(self.api + 'clients').then((response) => {
                   // console.log(response.data)
                   self.tableData = response.data;
                   console.log(response.data)
@@ -147,7 +147,7 @@
                 this.update = true;
                 this.addform.newName = row.clientname;
                 this.addform.newAddress = row.clientaddress;
-                this.id = row.client_id;
+                this.id = row.clientId;
             },
             updateToSql(row) {
               if(this.addform.newName == "") {
@@ -164,10 +164,9 @@
 
 
                 var qs = require('qs');
-                this.$axios.post(this.api + 'updateClient', qs.stringify({
+                this.$axios.post(this.api + 'updateClient/' + this.id, qs.stringify({
                   clientname: this.addform.newName,
                   clientaddress: this.addform.newAddress,
-                  client_id: this.id
                 }),
                 {
                   headers: {
@@ -195,11 +194,12 @@
               type: 'warning'
             }).then(() => {
 
-              console.log(row.book_id);
-              var url = this.api + 'deleteClient?id=' + row.client_id;
+              console.log(row.bookId);
+              var url = this.api + 'deleteClient';
               var qs = require('qs');
-              this.$axios.delete(url, qs.stringify({
+              this.$axios.post(url, qs.stringify({
                 // book_id: row.book_id
+                clientId: row.clientId
               }),
               {
                 headers: {

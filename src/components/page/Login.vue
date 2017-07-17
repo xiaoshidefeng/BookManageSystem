@@ -34,7 +34,7 @@
                         { required: true, message: '请输入密码', trigger: 'blur' }
                     ]
                 },
-                api: 'http://127.0.0.1:8080/'
+                api: 'http://118.89.159.95:8890/api/'
             }
         },
         methods: {
@@ -42,8 +42,11 @@
                 const self = this;
                 console.log(this.username);
                 var qs = require('qs');
-                this.$axios.post(self.api + 'userlogin', qs.stringify({
-                  name: this.ruleForm.username,
+
+                // localStorage.setItem('ms_username',self.ruleForm.username);
+                // self.$router.push('/readme');
+                this.$axios.post(self.api + 'login', qs.stringify({
+                  username: this.ruleForm.username,
                   password: this.ruleForm.password,
                 }),
                 {
@@ -52,9 +55,13 @@
                   }
                 }).then(response => {
                   console.log(response.data);
-                  if (response.data == 'success') {
+                  if (response.data.code == 200) {
                       localStorage.setItem('ms_username',self.ruleForm.username);
                       self.$router.push('/readme');
+                      this.$message({
+                        type: 'success',
+                        message: '登录成功'
+                      });
                   } else {
                       console.log('error submit!!');
                       this.$message({
